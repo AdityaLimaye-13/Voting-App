@@ -8,9 +8,11 @@ import {
   TextInput,
   Platform,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import { Firebase } from "../database/config";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 const Register = () => {
   const navigation = useNavigation();
@@ -38,6 +40,16 @@ const Register = () => {
   };
   return (
     <SafeAreaView style={styles.wrapper}>
+      <View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("login")}
+        >
+          <Text style={styles.backBtn}>
+            <Ionicons name="arrow-back-circle" size={24} color="black" />
+            Back
+          </Text>
+        </TouchableOpacity>
+      </View>
       <View>
         <Text style={styles.titleText}>Register</Text>
       </View>
@@ -80,6 +92,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
+  backBtn: {
+    position:"absolute",
+    top:10,
+    right:130,
+    fontSize:24,
+  },
   inputFields: {
     display: "flex",
     justifyContent: "center",
@@ -96,14 +114,14 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   titleText: {
-    marginTop:50,
+    marginTop: 50,
     textAlign: "center",
     fontSize: 20,
     color: "crimson",
     fontWeight: "bold",
   },
   logLinkText: {
-    marginTop:20,
+    marginTop: 20,
     textAlign: "center",
     fontSize: 20,
     color: "crimson",
