@@ -7,10 +7,10 @@ import {
   SafeAreaView,
   TextInput,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Firebase } from "../database/config";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -22,6 +22,15 @@ const Login = () => {
       await Firebase.auth().signInWithEmailAndPassword(email, password);
     } catch (error) {
       alert(error.message);
+    }
+  };
+
+  checkUser = (email, password) => {
+    if (email === "admin@admin.com" && password === "admin1234") {
+      navigation.navigate("admin-panel");
+      console.log("here");
+    } else {
+      loginUser(email, password);
     }
   };
 
@@ -44,7 +53,7 @@ const Login = () => {
         ></TextInput>
       </View>
       <TouchableOpacity
-        onPress={() => loginUser(email, password)}
+        onPress={() => checkUser(email, password)}
         style={styles.button}
       >
         <Text style={styles.buttonText}>Login</Text>
@@ -83,14 +92,14 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   titleText: {
-    marginTop:50,
+    marginTop: 50,
     textAlign: "center",
     fontSize: 20,
     color: "crimson",
     fontWeight: "bold",
   },
   regLinkText: {
-    marginTop:20,
+    marginTop: 20,
     textAlign: "center",
     fontSize: 20,
     color: "crimson",

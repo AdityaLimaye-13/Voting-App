@@ -1,4 +1,4 @@
-import { StyleSheet} from "react-native";
+import { StyleSheet } from "react-native";
 import Login from "./src/components/Login";
 import Register from "./src/components/Register";
 import { NavigationContainer } from "@react-navigation/native";
@@ -6,6 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Firebase } from "./src/database/config";
 import { useEffect, useState } from "react";
 import VotingPage from "./src/components/VotingPage";
+import AdminPanel from "./src/components/AdminPanel";
 
 const Stack = createStackNavigator();
 
@@ -19,7 +20,7 @@ function App() {
     appId: "1:441163329981:web:831154ff3d0f435a5ce2d4",
     measurementId: "G-E196FKRMEM",
   };
-  Firebase.initializeApp(firebaseConfig)
+  Firebase.initializeApp(firebaseConfig);
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
@@ -38,6 +39,7 @@ function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" component={Login} />
         <Stack.Screen name="register" component={Register} />
+        <Stack.Screen name="admin-panel" component={AdminPanel} />
       </Stack.Navigator>
     );
   }
@@ -54,5 +56,5 @@ export default () => {
     <NavigationContainer>
       <App />
     </NavigationContainer>
-  )
+  );
 };
