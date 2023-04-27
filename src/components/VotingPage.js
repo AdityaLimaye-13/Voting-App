@@ -8,6 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   Firebase,
@@ -19,10 +20,14 @@ import {
   getDocs,
 } from "../database/config";
 import CandidateItem from "./CandidateItem";
+import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
+import AlreadyVoted from "./AlreadyVoted";
 
 const VotingPage = () => {
+
   const [candidate, setCandidate] = useState([]);
+  const [hasVoted, setHasVoted] = useState(false);
 
   const getCandidates = async () => {
     const querySnapshot = await getDocs(collection(db, "candidates"));
@@ -36,34 +41,66 @@ const VotingPage = () => {
     setCandidate(candidatesList);
   };
 
+  const fetchData = async (uid) => {
+    try {
+      const doc = await Firebase.firestore().collection("users").doc(uid).get();
+      setHasVoted(doc.data().hasVoted);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const currentUser = Firebase.auth().currentUser;
+  if (currentUser) {
+    const uid = currentUser.uid;
+    fetchData(uid);
+  }
+
+  console.log(hasVoted);
+
   useEffect(() => {
     getCandidates();
-  }, []);
+  }, [hasVoted]);
 
   function logout() {
     return Firebase.auth().signOut();
   }
 
-  return (
-    <View style={styles.wrapper}>
-      <Text style={styles.title}>Vote Here</Text>
-      <FlatList
-        data={candidate}
-        renderItem={({ item }) => (
-          <CandidateItem
-            candidateName={item.candidateName}
-            voteCnt={item.count}
+  if (hasVoted) {
+    return (
+      <AlreadyVoted />
+    );
+  } else {
+    return (
+      <View style={styles.wrapper}>
+        <Text style={styles.title}>Vote Here</Text>
+        {candidate.length > 0 ? (
+          <FlatList
+            data={candidate}
+            renderItem={({ item }) => (
+              <CandidateItem
+                candidateName={item.candidateName}
+                voteCounter={item.count}
+                id={item.id}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+        ) : (
+          <ActivityIndicator
+            style={{ paddingVertical: 360 }}
+            color="blue"
+            size={"large"}
           />
         )}
-        keyExtractor={(item) => item.id}
-      />
-      <TouchableOpacity onPress={logout}>
-        <Text style={styles.button}>
-          <Feather name="arrow-left-circle" size={18} color="white" /> Logout
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+        <TouchableOpacity onPress={logout}>
+          <Text style={styles.button}>
+            <Feather name="arrow-left-circle" size={18} color="white" /> Logout
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

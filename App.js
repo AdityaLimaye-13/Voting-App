@@ -7,6 +7,8 @@ import { Firebase } from "./src/database/config";
 import { useEffect, useState } from "react";
 import VotingPage from "./src/components/VotingPage";
 import AdminPanel from "./src/components/AdminPanel";
+import AlreadyVoted from "./src/components/AlreadyVoted";
+import { doc, getDoc } from "firebase/firestore";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +25,8 @@ function App() {
   Firebase.initializeApp(firebaseConfig);
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [userdata, setUserData] = useState(null);
+  const [admin, setAdmin] = useState(false);
 
   function onAuthChanged(user) {
     setUser(user);
@@ -46,6 +50,7 @@ function App() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="voting-page" component={VotingPage} />
+      <Stack.Screen name="already-voted" component={AlreadyVoted} />
       <Stack.Screen name="admin-panel" component={AdminPanel} />
     </Stack.Navigator>
   );

@@ -8,9 +8,8 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
   TextInput,
-  ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import {
   Firebase,
@@ -21,6 +20,7 @@ import {
   addDoc,
   getDocs,
 } from "../database/config";
+import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
 const AdminPanel = () => {
@@ -56,8 +56,12 @@ const AdminPanel = () => {
     getCandidates();
   }, [candidateList]);
 
-  function logout() {
-    return Firebase.auth().signOut();
+  async function logout() {
+    try {
+      await Firebase.auth().signOut(); 
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -79,18 +83,26 @@ const AdminPanel = () => {
       <TouchableOpacity onPress={addCandidate}>
         <Text style={styles.button}>Add Candidate</Text>
       </TouchableOpacity>
-      <FlatList
-        data={candidateList}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.adminList}>
-              <Text style={styles.listText}>{item.candidateName}</Text>
-              <Text style={styles.listText}>{item.count}</Text>
-            </View>
-          );
-        }}
-        keyExtractor={(item) => item.id}
-      />
+      {candidateList.length > 0 ? (
+        <FlatList
+          data={candidateList}
+          renderItem={({ item }) => {
+            return (
+              <View style={styles.adminList}>
+                <Text style={styles.listText}>{item.candidateName}</Text>
+                <Text style={styles.listText}>{item.count}</Text>
+              </View>
+            );
+          }}
+          keyExtractor={(item) => item.id}
+        />
+      ) : (
+        <ActivityIndicator
+          style={{ paddingVertical: 360 }}
+          color="blue"
+          size={"large"}
+        />
+      )}
     </SafeAreaView>
   );
 };

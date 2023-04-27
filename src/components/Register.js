@@ -10,7 +10,15 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
-import { Firebase } from "../database/config";
+import {
+  Firebase,
+  app,
+  db,
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+} from "../database/config";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -19,8 +27,9 @@ const Register = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [confPass, setConfPass] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  registerUser = async (email, password, confPass) => {
+  const registerUser = async (email, password, confPass) => {
     if (password === confPass) {
       await Firebase.auth()
         .createUserWithEmailAndPassword(email, password)
@@ -31,19 +40,30 @@ const Register = () => {
             .set({
               email,
               password,
+              hasVoted: false,
             });
         });
-      console.log(`logged the data`);
+        setIsLoggedIn(true)
+        alert("Account created successfully, Please login again")
     } else {
       alert("passwords do not match");
     }
   };
+
+  const logout = ()=>{
+    setTimeout(function () {
+      Firebase.auth().signOut();
+    }, 1000);
+  }
+
+  if(isLoggedIn){
+    logout()
+  }
+
   return (
     <SafeAreaView style={styles.wrapper}>
       <View>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("login")}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate("login")}>
           <Text style={styles.backBtn}>
             <Ionicons name="arrow-back-circle" size={24} color="black" />
             Back
@@ -93,10 +113,10 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   backBtn: {
-    position:"absolute",
-    top:10,
-    right:130,
-    fontSize:24,
+    position: "absolute",
+    top: 10,
+    right: 130,
+    fontSize: 24,
   },
   inputFields: {
     display: "flex",

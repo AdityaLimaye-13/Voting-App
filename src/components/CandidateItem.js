@@ -1,23 +1,59 @@
-import React, { useState } from "react";
+import { doc, increment, updateDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  Firebase,
+  app,
+  db,
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+} from "../database/config";
 
 const CandidateItem = (props) => {
-  const [votecount, setVoteCount] = useState();
-  function vote() {
+  const user = Firebase.auth().currentUser;
+  const [voted, setVoted] = useState(true);
+
+  const updateVotingStatus = async () => {
+    const userStatusRef = doc(db, "users", user.uid);
+    setVoted(true);
+    await updateDoc(userStatusRef, {
+      hasVoted: voted,
+    });
+  };
+
+  async function vote() {
     Alert.alert("Confirmation", "Do you want to vote for this candidate?", [
       {
         text: "Yes",
         onPress: () => {
-          alert("Submitted your vote");
+          updateVoteCount();
+          updateVotingStatus();
+          alert("Voting successfull, You will be logged out now");
+          setTimeout(() => {
+            Firebase.auth()
+              .signOut()
+              .then(() => console.log("User signed out successfully"))
+              .catch((error) => console.log("Error signing out:", error));
+          }, 300);
         },
       },
       { text: "No", onPress: () => noHandler() },
     ]);
 
     function noHandler() {
-      alert("Canceled,Please vote again");
+      alert("Canceled, Please vote again");
     }
   }
+
+  const updateVoteCount = async () => {
+    const voteCountRef = doc(db, "candidates", props.id);
+
+    await updateDoc(voteCountRef, {
+      count: increment(1),
+    });
+  };
 
   return (
     <TouchableOpacity onPress={vote} style={styles.item}>

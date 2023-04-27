@@ -17,20 +17,20 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  checkUser = async (email, password) => {
+    if (email === "admin@admin.com" && password === "admin1234") {
+      await Firebase.auth().signInWithEmailAndPassword(email, password);
+      navigation.navigate('admin-panel')
+    } else {
+      loginUser(email, password);
+    }
+  };
+
   loginUser = async (email, password) => {
     try {
       await Firebase.auth().signInWithEmailAndPassword(email, password);
     } catch (error) {
       alert(error.message);
-    }
-  };
-
-  checkUser = async (email, password) => {
-    if (email === "admin@admin.com" && password === "admin1234") {
-      await Firebase.auth().signInWithEmailAndPassword(email, password)
-      navigation.navigate('admin-panel')
-    } else {
-      loginUser(email, password);
     }
   };
 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   titleText: {
     marginTop: 50,
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 40,
     color: "crimson",
     fontWeight: "bold",
   },
