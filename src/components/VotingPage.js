@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,69 +9,58 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { Firebase } from "../database/config";
+import {
+  Firebase,
+  app,
+  db,
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+} from "../database/config";
+import CandidateItem from "./CandidateItem";
+import { Feather } from "@expo/vector-icons";
 
-const Stack = createStackNavigator();
 const VotingPage = () => {
-  const candidates = [
-    {
-      id: 1,
-      name: "Candidate 1",
-    },
-    {
-      id: 2,
-      name: "Candidate 2",
-    },
-    {
-      id: 3,
-      name: "Candidate 3",
-    },
-    {
-      id: 4,
-      name: "Candidate 4",
-    },
-  ];
+  const [candidate, setCandidate] = useState([]);
 
-  function vote() {
-    Alert.alert("Confirmation", "Do you want to vote for this candidate?", [
-      {
-        text: "Yes",
-        onPress: () => {
-          alert("Submitted your vote");
-          Firebase.auth().signOut();
-        },
-      },
-      { text: "No", onPress: () => noHandler() },
-    ]);
+  const getCandidates = async () => {
+    const querySnapshot = await getDocs(collection(db, "candidates"));
+    const candidatesList = [];
+    querySnapshot.forEach((doc) => {
+      candidatesList.push({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
+    setCandidate(candidatesList);
+  };
 
-    function noHandler() {
-      alert("Canceled,Please vote again");
-    }
-  }
+  useEffect(() => {
+    getCandidates();
+  }, []);
+
   function logout() {
     return Firebase.auth().signOut();
   }
+
   return (
     <View style={styles.wrapper}>
       <Text style={styles.title}>Vote Here</Text>
       <FlatList
-        data={candidates}
-        renderItem={(element) => {
-          return (
-            <TouchableOpacity onPress={vote} style={styles.item}>
-              <Text
-                style={{ fontSize: 20, fontWeight: "bold", color: "white" }}
-              >
-                {element.item.name}
-              </Text>
-            </TouchableOpacity>
-          );
-        }}
-        keyExtractor={(element) => element.id}
+        data={candidate}
+        renderItem={({ item }) => (
+          <CandidateItem
+            candidateName={item.candidateName}
+            voteCnt={item.count}
+          />
+        )}
+        keyExtractor={(item) => item.id}
       />
       <TouchableOpacity onPress={logout}>
-        <Text style={styles.button}>Logout</Text>
+        <Text style={styles.button}>
+          <Feather name="arrow-left-circle" size={18} color="white" /> Logout
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -79,7 +68,7 @@ const VotingPage = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    display: "flex",
+    flex: 1,
     justifyContent: "center",
     paddingHorizontal: 30,
     marginTop: 80,
@@ -89,25 +78,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 50,
     fontWeight: "bold",
-    color: "blue",
+    color: "#2a2c2e",
     marginBottom: 30,
-  },
-  item: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    padding: 20,
-    marginHorizontal: 8,
-    marginVertical: 10,
-    backgroundColor: "indianred",
-    borderWidth: 3,
-    borderRadius: 8,
-    textAlign: "center",
   },
   button: {
     textAlign: "center",
     position: "absolute",
-    top: 30,
+    bottom: 20,
     left: 120,
     width: 120,
     backgroundColor: "crimson",
@@ -115,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     color: "white",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 19,
   },
 });
 

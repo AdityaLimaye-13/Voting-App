@@ -39,7 +39,6 @@ function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" component={Login} />
         <Stack.Screen name="register" component={Register} />
-        <Stack.Screen name="admin-panel" component={AdminPanel} />
       </Stack.Navigator>
     );
   }
@@ -47,6 +46,7 @@ function App() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="voting-page" component={VotingPage} />
+      <Stack.Screen name="admin-panel" component={AdminPanel} />
     </Stack.Navigator>
   );
 }

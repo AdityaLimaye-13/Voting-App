@@ -25,10 +25,10 @@ const Login = () => {
     }
   };
 
-  checkUser = (email, password) => {
+  checkUser = async (email, password) => {
     if (email === "admin@admin.com" && password === "admin1234") {
-      navigation.navigate("admin-panel");
-      console.log("here");
+      await Firebase.auth().signInWithEmailAndPassword(email, password)
+      navigation.navigate('admin-panel')
     } else {
       loginUser(email, password);
     }
